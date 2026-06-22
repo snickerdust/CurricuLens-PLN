@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Evaluasi & Testing Sistem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/css/icons.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        /* Dark mode overrides */
+        .dark body { background-color: #0f172a !important; color: #e2e8f0; }
+        .dark header { background-color: #1e293b !important; border-color: #334155 !important; }
+        .dark .bg-white { background-color: #1e293b !important; }
+        .dark .bg-slate-50 { background-color: #0f172a !important; }
+        .dark .bg-slate-100 { background-color: #334155 !important; }
+        .dark .border-slate-100, .dark .border-slate-200, .dark .border-slate-300 { border-color: #334155 !important; }
+        .dark .text-slate-900, .dark .text-slate-800, .dark .text-slate-700, .dark .text-slate-600 { color: #f1f5f9 !important; }
+        .dark .text-slate-500, .dark .text-slate-400 { color: #94a3b8 !important; }
+        .dark .text-indigo-700 { color: #818cf8 !important; }
+        .dark .bg-indigo-50 { background-color: #1e1b4b !important; border-color: #312e81 !important; }
+        .dark .text-indigo-500 { color: #a5b4fc !important; }
+        .dark hr { border-color: #334155 !important; }
+        .dark th { background-color: #1e293b !important; color: #f8fafc !important; border-bottom-color: #334155 !important; }
+        .dark td { border-color: #334155 !important; }
+        .dark input[type=text], .dark textarea {
+            background-color: #0f172a !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+        }
+        .dark input[type=text]::placeholder, .dark textarea::placeholder { color: #64748b !important; }
+        .dark .hover\:bg-slate-50:hover { background-color: #334155 !important; }
+        .dark input.peer:checked ~ div { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
+        .dark .group:hover .group-hover\:text-emerald-600 { color: #34d399 !important; }
+        .dark .group:hover .group-hover\:text-rose-600 { color: #fb7185 !important; }
+        .dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-20 shadow-sm sticky top-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-indigo-600 transition-colors">
+                <i class="ph ph-arrow-left text-2xl"></i>
+            </a>
+            <h1 class="text-xl font-bold text-slate-900">Form Evaluasi & Testing Sistem</h1>
+        </div>
+        <button id="theme-toggle" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-all">
+            <i id="theme-icon" class="ph ph-moon text-xl"></i>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6 w-full max-w-4xl mx-auto space-y-8">
+        
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 md:p-8">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Skenario Pengujian Black-box Testing</h2>
+                <p class="text-slate-500 text-sm">Berikan penilaian status (Lulus/Gagal) dan keterangan jika gagal pada masing-masing fitur yang diuji sesuai Tabel 3.11.</p>
+            </div>
+
+            <form id="evaluation-form" class="space-y-8" novalidate>
+                
+                <!-- Identitas / Meta -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Penguji</label>
+                        <input type="text" id="tester-name" name="tester-name" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" placeholder="Masukkan nama Anda">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Program Studi</label>
+                        <input type="text" id="program-studi" name="program-studi" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" placeholder="Masukkan Program Studi Anda">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Fakultas</label>
+                        <input type="text" id="fakultas" name="fakultas" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" placeholder="Masukkan Fakultas Anda">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Universitas</label>
+                        <input type="text" id="universitas" name="universitas" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all" placeholder="Masukkan Universitas Anda">
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- Black-box Testing Section -->
+                <div class="space-y-6" id="blackbox-section">
+                    <h3 class="text-lg font-bold text-indigo-700 flex items-center gap-2">
+                        <i class="ph ph-terminal-window"></i> 1. Black-box Testing
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-600 border border-slate-200 rounded-lg overflow-hidden">
+                            <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold">
+                                <tr>
+                                    <th class="px-4 py-3 border-b border-slate-200">No</th>
+                                    <th class="px-4 py-3 border-b border-slate-200 w-1/4">Fitur / Skenario</th>
+                                    <th class="px-4 py-3 border-b border-slate-200">Status</th>
+                                    <th class="px-4 py-3 border-b border-slate-200 w-1/3">Keterangan (Jika Gagal)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bb-table-body" class="divide-y divide-slate-100">
+                                <!-- Generated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <hr class="border-slate-100">
+
+                <!-- SUS Questionnaire Section -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-bold text-indigo-700 flex items-center gap-2">
+                        <i class="ph ph-clipboard-text"></i> 2. Kuesioner SUS
+                    </h3>
+                    <p class="text-xs text-slate-500">Berikan skor 1 (Sangat Tidak Setuju) hingga 5 (Sangat Setuju) untuk pernyataan berikut sesuai Tabel 3.12.</p>
+                    
+                    <div class="space-y-4" id="sus-section">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 border-t border-slate-100 flex justify-end">
+                    <button type="submit" id="submit-btn" class="bg-indigo-600 text-white font-semibold py-3 px-8 rounded-xl shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all active:scale-[0.98] flex items-center gap-2">
+                        <i class="ph ph-paper-plane-right text-lg"></i>
+                        <span>Simpan Hasil Evaluasi</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center transform scale-95 transition-transform duration-300">
+            <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-check-circle text-4xl text-emerald-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Berhasil!</h3>
+            <p class="text-slate-500 text-sm mb-6">Data evaluasi Anda telah berhasil disimpan ke database.</p>
+            <button onclick="closeModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-lg transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const bbData = [
+            { id: "bb1", fitur: "Upload Dokumen", skenario: "Unggah dokumen Word (.docx)", expected: "Teks berhasil diekstrak sepenuhnya dan tersimpan ke dalam sistem." },
+            { id: "bb2", fitur: "Upload Dokumen", skenario: "Unggah dokumen PowerPoint (.pptx)", expected: "Teks dari seluruh slide berhasil diekstrak dan tersimpan." },
+            { id: "bb3", fitur: "Upload Dokumen", skenario: "Unggah dokumen PDF", expected: "Teks berhasil diekstrak sepenuhnya dan tersimpan ke dalam sistem." },
+            { id: "bb4", fitur: "Summarization", skenario: "Pengguna memilih dokumen lalu menjalankan analisis", expected: "Sistem menampilkan hasil topic modeling dan summarization." },
+            { id: "bb5", fitur: "Analisis Overlap", skenario: "Pengguna memilih >1 dokumen lalu melihat skor overlap", expected: "Sistem menampilkan skor Jaccard index antar topik." },
+            { id: "bb6", fitur: "Search Bar", skenario: "Pengguna mengetikkan kata kunci pada kolom pencarian dokumen", expected: "Sistem menyaring dokumen di sidebar dan menyoroti kalimat hasil pencarian secara real-time." },
+            { id: "bb7", fitur: "Hapus Konten", skenario: "Pengguna mengklik tombol hapus (icon sampah) pada dokumen atau kurikulum", expected: "Dokumen atau kurikulum yang telah dibuat berhasil dihapus dari database dan daftar di sidebar langsung terupdate." }
+        ];
+
+        const susData = [
+            "Saya pikir saya akan sering menggunakan sistem ini.",
+            "Saya merasa sistem ini terlalu rumit.",
+            "Saya merasa sistem ini mudah digunakan.",
+            "Saya butuh bantuan orang lain/dukungan teknis untuk menggunakan sistem ini.",
+            "Saya merasa berbagai fungsi dalam sistem ini terintegrasi dengan baik.",
+            "Saya merasa ada banyak inkonsistensi dalam sistem ini.",
+            "Saya rasa orang lain akan cepat belajar menggunakan sistem ini.",
+            "Saya merasa sistem ini terlalu rumit untuk dipahami.",
+            "Saya merasa percaya diri menggunakan sistem ini.",
+            "Saya perlu banyak belajar sebelum bisa menggunakan sistem ini."
+        ];
+
+        // Render Blackbox
+        const bbTableBody = document.getElementById('bb-table-body');
+        bbTableBody.innerHTML = bbData.map((item, index) => `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-4 align-top font-medium text-slate-800">${index + 1}</td>
+                <td class="px-4 py-4 align-top">
+                    <div class="font-semibold text-slate-800 mb-1">${item.fitur}</div>
+                    <div class="text-xs text-slate-500 mb-1">${item.skenario}</div>
+                    <div class="text-[10px] text-indigo-500 bg-indigo-50 p-1.5 rounded border border-indigo-100">
+                        <span class="font-bold">Harapan:</span> ${item.expected}
+                    </div>
+                </td>
+                <td class="px-4 py-4 align-top">
+                    <div class="flex flex-col gap-2 mt-1">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="${item.id}_status" value="Lulus" required class="w-4 h-4 text-emerald-500 focus:ring-emerald-500 cursor-pointer">
+                            <span class="text-sm font-medium text-slate-600 group-hover:text-emerald-600 transition-colors">Lulus</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="${item.id}_status" value="Gagal" required class="w-4 h-4 text-rose-500 focus:ring-rose-500 cursor-pointer">
+                            <span class="text-sm font-medium text-slate-600 group-hover:text-rose-600 transition-colors">Gagal</span>
+                        </label>
+                    </div>
+                </td>
+                <td class="px-4 py-4 align-top">
+                    <textarea name="${item.id}_notes" rows="2" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Isi jika status Gagal..."></textarea>
+                </td>
+            </tr>
+        `).join('');
+
+        // Render SUS
+        const susSection = document.getElementById('sus-section');
+        susSection.innerHTML = susData.map((q, index) => `
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex gap-3 items-start flex-grow">
+                    <span class="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-white rounded-full border border-slate-200 text-xs font-bold text-slate-600 shadow-sm">${index + 1}</span>
+                    <p class="text-sm font-medium text-slate-700 leading-snug pt-0.5">${q}</p>
+                </div>
+                <div class="flex gap-2 justify-center md:justify-end shrink-0 pl-9 md:pl-0">
+                    ${[1, 2, 3, 4, 5].map(score => `
+                        <label class="relative flex flex-col items-center cursor-pointer group">
+                            <input type="radio" name="sus_${index + 1}" value="${score}" required class="peer sr-only">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 font-semibold transition-all peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 group-hover:border-indigo-400 group-hover:shadow-sm">
+                                ${score}
+                            </div>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        // Form Submit Handler
+        document.getElementById('evaluation-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i class="ph ph-spinner animate-spin text-lg"></i><span>Menyimpan...</span>`;
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            
+            // Manual Validation
+            const rawName = formData.get('tester-name') || '';
+            if (!rawName.trim()) {
+                alert('Silakan isi Nama Penguji terlebih dahulu.');
+                document.getElementById('tester-name').focus();
+                btn.innerHTML = originalContent; btn.disabled = false;
+                return;
+            }
+
+            const rawProgramStudi = formData.get('program-studi') || '';
+            if (!rawProgramStudi.trim()) {
+                alert('Silakan isi Program Studi terlebih dahulu.');
+                document.getElementById('program-studi').focus();
+                btn.innerHTML = originalContent; btn.disabled = false;
+                return;
+            }
+
+            const rawFakultas = formData.get('fakultas') || '';
+            if (!rawFakultas.trim()) {
+                alert('Silakan isi Fakultas terlebih dahulu.');
+                document.getElementById('fakultas').focus();
+                btn.innerHTML = originalContent; btn.disabled = false;
+                return;
+            }
+
+            const rawUniversitas = formData.get('universitas') || '';
+            if (!rawUniversitas.trim()) {
+                alert('Silakan isi Universitas terlebih dahulu.');
+                document.getElementById('universitas').focus();
+                btn.innerHTML = originalContent; btn.disabled = false;
+                return;
+            }
+
+            for (let i = 0; i < bbData.length; i++) {
+                const status = formData.get(`${bbData[i].id}_status`);
+                if (!status) {
+                    alert(`Silakan isi status (Lulus/Gagal) pada Black-box Testing No. ${i + 1} (${bbData[i].fitur}).`);
+                    document.querySelector(`input[name="${bbData[i].id}_status"]`).scrollIntoView({behavior: 'smooth', block: 'center'});
+                    btn.innerHTML = originalContent; btn.disabled = false;
+                    return;
+                }
+                if (status === 'Gagal') {
+                    const notes = formData.get(`${bbData[i].id}_notes`) || '';
+                    if (!notes.trim()) {
+                        alert(`Anda memilih status "Gagal" pada Black-box Testing No. ${i + 1}. Silakan isi alasannya di kolom Keterangan.`);
+                        const textarea = document.querySelector(`textarea[name="${bbData[i].id}_notes"]`);
+                        textarea.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        textarea.focus();
+                        btn.innerHTML = originalContent; btn.disabled = false;
+                        return;
+                    }
+                }
+            }
+
+            for (let i = 0; i < susData.length; i++) {
+                if (!formData.get(`sus_${i + 1}`)) {
+                    alert(`Silakan pilih skor (1-5) untuk pernyataan Kuesioner SUS No. ${i + 1}.`);
+                    document.querySelector(`input[name="sus_${i + 1}"]`).parentElement.parentElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    btn.innerHTML = originalContent; btn.disabled = false;
+                    return;
+                }
+            }
+
+            const payload = {
+                testerName: rawName.trim(),
+                programStudi: rawProgramStudi.trim(),
+                fakultas: rawFakultas.trim(),
+                universitas: rawUniversitas.trim(),
+                blackbox: {},
+                sus: {}
+            };
+
+            // Collect Blackbox data
+            bbData.forEach(item => {
+                payload.blackbox[item.id] = {
+                    status: formData.get(`${item.id}_status`),
+                    notes: formData.get(`${item.id}_notes`) || ""
+                };
+            });
+
+            // Collect SUS data
+            susData.forEach((_, index) => {
+                payload.sus[`q${index + 1}`] = parseInt(formData.get(`sus_${index + 1}`));
+            });
+
+            try {
+                const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+                const API_BASE = isLocal ? "http://localhost:8000/api" : "https://snickerdust-pln-summary.hf.space/api";
+
+                const res = await fetch(`${API_BASE}/evaluations`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!res.ok) throw new Error(await res.text());
+
+                const modal = document.getElementById('success-modal');
+                modal.classList.remove('hidden');
+                setTimeout(() => { modal.classList.remove('opacity-0'); modal.children[0].classList.remove('scale-95'); }, 10);
+                e.target.reset();
+            } catch (err) {
+                console.error("Error saving document: ", err);
+                alert("Terjadi kesalahan saat menyimpan data. Periksa console untuk detail.");
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        function applyTheme(isDark) {
+            document.documentElement.classList.toggle('dark', isDark);
+            themeIcon.className = isDark ? 'ph ph-sun text-xl' : 'ph ph-moon text-xl';
+        }
+        
+        applyTheme(localStorage.getItem('theme') === 'dark');
+        
+        themeToggle.addEventListener('click', () => {
+            const isDark = !document.documentElement.classList.contains('dark');
+            applyTheme(isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // Close modal
+        window.closeModal = () => {
+            const modal = document.getElementById('success-modal');
+            modal.classList.add('opacity-0');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+    </script>
+
+</body>
+</html>

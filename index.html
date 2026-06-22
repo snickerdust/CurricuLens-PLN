@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CurricuLens</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <!-- Memuat Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icon Library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/css/icons.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Tree View Styles */
+        .sub-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .sub-list.open {
+            max-height: 2000px;
+        }
+        .folder-toggle-icon {
+            transition: transform 0.2s ease;
+        }
+        .folder-toggle.open .folder-toggle-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #e0e7ff;
+            border-top: 3px solid #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spin-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 12s linear infinite;
+        }
+
+        /* Search highlight */
+        mark { background-color:#fde047; border-radius:2px; padding:0 1px; }
+
+        /* Dark Mode Toggle transition */
+        body { transition: background-color 0.2s, color 0.2s; }
+
+        /* ── DARK MODE OVERRIDES ──────────────────────── */
+        .dark { background-color:#0f172a !important; color:#cbd5e1; }
+        .dark header { background-color:#1e293b !important; border-color:#334155 !important; }
+        .dark h1 { color:#f1f5f9 !important; }
+        .dark .bg-white { background-color:#1e293b !important; }
+        .dark .bg-slate-50 { background-color:#0f172a !important; }
+        .dark .bg-slate-50\/50 { background-color:#0f172a !important; }
+        .dark .bg-slate-100 { background-color:#334155 !important; }
+        .dark .border-slate-200 { border-color:#334155 !important; }
+        .dark .border-slate-100 { border-color:#1e293b !important; }
+        .dark .border-slate-300 { border-color:#475569 !important; }
+        .dark .text-slate-900, .dark .text-slate-800 { color:#f1f5f9 !important; }
+        .dark .text-slate-700, .dark .text-slate-600 { color:#cbd5e1 !important; }
+        .dark .text-slate-500 { color:#94a3b8 !important; }
+        .dark .text-slate-400, .dark .text-slate-300 { color:#64748b !important; }
+        .dark input[type=search], .dark select {
+            background-color:#1e293b !important;
+            border-color:#475569 !important;
+            color:#e2e8f0 !important;
+        }
+        .dark input::placeholder { color:#64748b !important; }
+        .dark .hover\:bg-slate-100:hover { background-color:#334155 !important; }
+        .dark .hover\:bg-white:hover { background-color:#334155 !important; }
+        .dark .hover\:bg-slate-50:hover { background-color:#1e293b !important; }
+        .dark .bg-rose-50 { background-color:#3b1212 !important; }
+        .dark .bg-amber-50 { background-color:#2d1a00 !important; }
+        .dark .bg-teal-50 { background-color:#042f2e !important; }
+        .dark .bg-indigo-50 { background-color:#1e1b4b !important; }
+        .dark .bg-emerald-100 { background-color:#052e16 !important; }
+        .dark .border-emerald-200 { border-color:#166534 !important; }
+        .dark .border-rose-100 { border-color:#7f1d1d !important; }
+        .dark .shadow-sm { box-shadow:0 1px 3px rgba(0,0,0,0.5) !important; }
+        .dark .shadow-md { box-shadow:0 4px 10px rgba(0,0,0,0.5) !important; }
+        .dark .shadow-2xl { box-shadow:0 25px 50px rgba(0,0,0,0.6) !important; }
+        .dark #dropdown-menu { background-color:#1e293b; border-color:#334155; }
+        .dark #dropdown-menu a { color:#e2e8f0; }
+        .dark #dropdown-menu a:hover { background-color:#334155 !important; }
+        .dark mark { background-color:#854d0e; color:#fef9c3; }
+        .dark .bg-indigo-600 { background-color:#4338ca !important; }
+        .dark .hover\:bg-indigo-700:hover { background-color:#3730a3 !important; }
+        .dark ::-webkit-scrollbar-thumb { background:#475569; }
+        .dark .upload-toggle-btn { box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .upload-toggle-btn { pulse-ring: none; }
+
+        /* Drop Zone */
+        #drop-zone { transition: all 0.2s; }
+        #drop-zone.drag-over { border-color:#6366f1 !important; background-color:#eef2ff !important; }
+        .dark #drop-zone.drag-over { background-color:#1e1b4b !important; }
+        /* Upload panel slide */
+        #upload-panel-body { animation: slideDown 0.2s ease; }
+        @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+        /* Panel minimized */
+        .panel-minimized > *:not(.panel-header) { display:none !important; }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col overflow-hidden bg-slate-50">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex-shrink-0 z-20">
+        <div class="max-w-7xl mx-auto w-full flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 transition-all">
+                    <i class="ph ph-lightning text-xl text-yellow-300 animate-pulse"></i>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Curricu<span class="text-indigo-600 dark:text-indigo-400">Lens</span></span>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <input type="search" id="search-input" placeholder="Cari dokumen..." class="pl-9 pr-4 py-2 w-64 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
+                    <i class="ph ph-magnifying-glass text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 text-lg"></i>
+                </div>
+                
+                <button id="theme-toggle" title="Toggle Dark/Light Mode" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all active:scale-95">
+                    <i id="theme-icon" class="ph ph-moon text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6 overflow-hidden flex flex-col">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow overflow-hidden max-w-7xl mx-auto w-full">
+
+            <!-- KOLOM 1: Panel Dokumen -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+                <div class="panel-header p-4 border-b border-slate-100 flex-shrink-0 flex justify-between items-center">
+                    <h2 class="font-semibold text-slate-800">Panel Dokumen</h2>
+                    <button id="add-curriculum-btn" title="Tambah Kurikulum Baru" class="w-7 h-7 flex items-center justify-center rounded text-indigo-600 hover:bg-indigo-50 transition-all">
+                        <i class="ph ph-plus text-sm"></i>
+                    </button>
+                </div>
+                
+                <div id="col1-body" class="flex-grow overflow-y-auto p-4">
+                    <ul id="database-root" class="space-y-1 text-sm text-slate-600">
+                        <div class="flex flex-col items-center justify-center py-10 text-slate-400">
+                            <div class="loader mb-3 scale-75"></div>
+                            <span>Memuat data...</span>
+                        </div>
+                    </ul>
+                </div>
+                
+                 <!-- Upload Panel Toggle -->
+                <div id="col1-upload" class="flex-shrink-0 border-t border-slate-200 p-3">
+                    <button id="upload-panel-toggle" class="upload-toggle-btn w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md hover:shadow-indigo-200 hover:shadow-lg transition-all active:scale-[0.98]">
+                        <div class="flex items-center gap-2.5 font-semibold text-sm">
+                            <i class="ph ph-upload-simple text-lg"></i>
+                            <span>Upload Dokumen</span>
+                        </div>
+                        <i id="upload-panel-caret" class="ph ph-caret-up text-indigo-200 text-base transition-transform duration-200"></i>
+                    </button>
+                    <div id="upload-panel-body" class="hidden px-4 pb-4 pt-2 space-y-2.5 bg-slate-50">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Kurikulum Tujuan</label>
+                            <select id="upload-curriculum-select" class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                                <option value="">-- Pilih Kurikulum --</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Kategori Dokumen</label>
+                            <select id="sumber-select" class="w-full text-xs border border-slate-200 rounded-lg p-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+                                <option value="1. Kurikulum &amp; Silabus">1. Kurikulum &amp; Silabus</option>
+                                <option value="2. Materi Pembelajaran">2. Materi Pembelajaran</option>
+                                <option value="3. Handout" selected>3. Handout</option>
+                            </select>
+                        </div>
+                        <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-lg p-4 text-center cursor-pointer hover:border-indigo-400 transition-all">
+                            <i class="ph ph-cloud-arrow-up text-2xl text-slate-400 mb-1"></i>
+                            <p class="text-xs text-slate-500 font-medium">Drag &amp; drop file di sini</p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">atau <span class="text-indigo-500 font-semibold">klik untuk memilih</span></p>
+                            <p class="text-[10px] text-slate-300 mt-1">PDF, DOCX, PPTX &bull; maks 100 MB</p>
+                        </div>
+                        <div id="selected-files-list" class="hidden space-y-1 max-h-24 overflow-y-auto"></div>
+                        <button id="upload-button" disabled class="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition-all active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="ph ph-upload-simple"></i><span>Upload</span>
+                        </button>
+                        <input type="file" id="file-input" class="hidden" multiple accept=".pdf,.docx,.pptx,.doc,.ppt">
+                    </div>
+                </div>
+            </div>
+
+            <!-- KOLOM 2: Hasil Analisis -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center flex-shrink-0">
+                    <h2 class="font-semibold text-slate-800">Hasil Analisis</h2>
+                    <!-- Dropdown -->
+                    <div class="relative">
+                        <button id="dropdown-button" class="flex items-center gap-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-md transition-colors">
+                            <span id="selected-curriculum-text">Pilih Kurikulum</span>
+                            <i class="ph ph-caret-down"></i>
+                        </button>
+                        <div id="dropdown-menu" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-200 z-10 py-1 hidden">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="col2-body" class="p-5 flex-grow overflow-y-auto custom-scrollbar">
+                    
+                    <!-- Run Analysis Button Area -->
+                    <button id="analyze-button" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition-all active:scale-[0.98] flex justify-center items-center gap-2 mb-6">
+                        <i class="ph ph-play-circle text-xl"></i>
+                        <span>Jalankan Analisis</span>
+                    </button>
+
+                    <!-- Loading State (Hidden by default) -->
+                    <div id="loading-state" class="hidden flex flex-col items-center justify-center py-12">
+                        <div class="loader mb-3"></div>
+                        <span class="text-sm text-slate-500">Memproses data...</span>
+                    </div>
+
+                    <!-- Content (Hidden initially) -->
+                    <div id="analysis-content" class="hidden space-y-6">
+                        
+                        <!-- Topic Modeling Section -->
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 mb-3">Hasil Topic Modeling</h3>
+                            <div id="topic-container" class="space-y-4">
+                                <!-- Topics injected here -->
+                            </div>
+                        </div>
+
+                        <!-- Summarization Section -->
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 mb-3">Hasil Summarization</h3>
+                            <ul id="summary-list" class="space-y-3">
+                                <!-- Summary injected here -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Empty State for Middle Panel -->
+                    <div id="empty-analysis-state" class="flex flex-col items-center justify-center py-10 text-center opacity-100 transition-opacity duration-300">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                            <i class="ph ph-chart-bar text-3xl text-slate-300"></i>
+                        </div>
+                        <p class="text-slate-400 text-sm">Klik "Jalankan Analisis" untuk melihat hasil.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- KOLOM 3: Analisis Tumpang Tindih -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex-shrink-0">
+                    <h2 class="font-semibold text-slate-800 leading-tight text-sm">
+                        Tumpang Tindih &mdash; <span id="overlap-target-name" class="text-indigo-600"></span>
+                    </h2>
+                </div>
+
+                <div id="col3-body" class="p-5 flex-grow overflow-y-auto custom-scrollbar bg-slate-50/50">
+
+                     <!-- Empty State for Right Panel -->
+                     <div id="empty-overlap-state" class="flex flex-col items-center justify-center h-full text-center p-6">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                            <i class="ph ph-intersect text-3xl text-slate-300"></i>
+                        </div>
+                        <p class="text-slate-500 text-sm font-medium mb-2">Butuh minimal 2 Kurikulum</p>
+                        <p class="text-slate-400 text-xs leading-relaxed">Analisis tumpang tindih memerlukan setidaknya dua kurikulum yang sudah selesai dianalisis.</p>
+                    </div>
+
+                    <div id="overlap-content" class="hidden space-y-6">
+                        <!-- Overlap cards injected here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Banner Form Evaluasi (Full Width Bottom) -->
+        <div class="flex-shrink-0 max-w-7xl mx-auto w-full mt-6">
+            <a href="/testing.html" class="relative overflow-hidden group flex items-center justify-between bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white rounded-2xl p-5 shadow-lg shadow-emerald-500/20 hover:shadow-2xl hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-1 active:scale-[0.99] border border-white/20">
+                <!-- Decorative background elements -->
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 group-hover:scale-110 transition-transform duration-700"></div>
+                
+                <div class="flex items-center gap-5 relative z-10">
+                    <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-inner group-hover:rotate-6 transition-transform">
+                        <i class="ph ph-clipboard-text text-3xl text-emerald-50"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold tracking-wide mb-1 flex items-center gap-2">
+                            Selesai Mencoba Aplikasi? <span class="flex h-3 w-3 relative"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-200 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-300"></span></span>
+                        </h3>
+                        <p class="text-emerald-50 text-sm font-medium opacity-90">Bantu kami dengan mengisi kuesioner hasil Black-box testing.</p>
+                    </div>
+                </div>
+                
+                <div class="relative z-10 font-bold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2" style="background-color: #ffffff !important; color: #0f766e !important;">
+                    <span>Mulai Evaluasi</span>
+                    <i class="ph ph-arrow-right font-bold group-hover:translate-x-1 transition-transform"></i>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <!-- Auto-Wakeup Overlay -->
+    <div id="wakeup-overlay" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-6 transition-all duration-300">
+        <div class="bg-white/10 border border-white/20 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full shadow-2xl flex flex-col items-center text-center">
+            <div class="relative w-20 h-20 mb-6 flex items-center justify-center">
+                <!-- Outer glowing ring -->
+                <div class="absolute inset-0 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin"></div>
+                <!-- Inner pulse -->
+                <div class="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center animate-pulse">
+                    <i class="ph ph-lightning text-2xl text-indigo-400"></i>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 tracking-wide">Membangunkan Server Analisis</h3>
+            <p class="text-indigo-200/80 text-sm leading-relaxed mb-4">
+                Server backend skripsi di Hugging Face sedang berhibernasi. Kami sedang mengaktifkannya kembali untuk Anda secara otomatis.
+            </p>
+            <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10 text-xs text-indigo-200">
+                <i class="ph ph-circle-notch animate-spin text-xs"></i>
+                <span id="wakeup-status">Menghubungkan ke server (1-2 menit)...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Viewing Documents -->
+    <div id="doc-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div class="flex items-center gap-3">
+                    <i id="modal-icon" class="ph ph-file-text text-2xl"></i>
+                    <h3 id="modal-title" class="font-bold text-slate-800 truncate max-w-[400px]">Judul Dokumen</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-200 transition-all">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto bg-white flex-grow">
+                <div id="modal-content" class="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">
+                    Memuat konten...
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 text-xs">
+                <span id="modal-meta" class="text-slate-400"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // === CONFIG ===
+            // Deteksi otomatis jika berjalan di localhost atau cloud (seperti HF Spaces)
+            const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname === "" || window.location.protocol === "file:";
+            const API_BASE = isLocal ? "http://localhost:8000/api" : "https://snickerdust-pln-summary.hf.space/api";
+            
+            // === STATE ===
+            let curricula = [];
+            let currentId = null;
+            let results = {}; // cache results {id: result_data}
+            let pollInterval = null;
+            let searchQuery = '';
+            let collapsedCategories = {}; // key: currId_catId
+            let collapsedCurricula = {};  // key: currId
+
+            // === ELEMENTS ===
+            const dbRoot = document.getElementById('database-root');
+            const dropdownButton = document.getElementById('dropdown-button');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            const selectedText = document.getElementById('selected-curriculum-text');
+            const analyzeBtn = document.getElementById('analyze-button');
+            
+            const analysisContent = document.getElementById('analysis-content');
+            const loadingState = document.getElementById('loading-state');
+            const emptyAnalysisState = document.getElementById('empty-analysis-state');
+            
+            const overlapContent = document.getElementById('overlap-content');
+            const emptyOverlapState = document.getElementById('empty-overlap-state');
+            const overlapTargetName = document.getElementById('overlap-target-name');
+
+            const topicContainer = document.getElementById('topic-container');
+            const summaryList = document.getElementById('summary-list');
+            const fileInput = document.getElementById('file-input');
+            const uploadBtn = document.getElementById('upload-button');
+            const addCurriculumBtn = document.getElementById('add-curriculum-btn');
+            const sumberSelect = document.getElementById('sumber-select');
+            const searchInput = document.getElementById('search-input');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const uploadCurriculumSelect = document.getElementById('upload-curriculum-select');
+            const dropZone = document.getElementById('drop-zone');
+            const selectedFilesList = document.getElementById('selected-files-list');
+            const uploadPanelToggle = document.getElementById('upload-panel-toggle');
+            const uploadPanelBody = document.getElementById('upload-panel-body');
+            const uploadPanelCaret = document.getElementById('upload-panel-caret');
+            let pendingFiles = [];
+
+            // Modal elements
+            const docModal = document.getElementById('doc-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalIcon = document.getElementById('modal-icon');
+            const modalMeta = document.getElementById('modal-meta');
+
+            // === API CALLS ===
+
+            async function fetchCurricula(autoSelectId = null) {
+                try {
+                    const res = await fetch(`${API_BASE}/curricula`);
+                    curricula = await res.json();
+                    renderSidebar();
+                    renderDropdown();
+                    renderUploadCurriculumSelect();
+                    if (autoSelectId) {
+                        selectCurriculum(autoSelectId);
+                    } else if (!currentId && curricula.length > 0) {
+                        selectCurriculum(curricula[0].id);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch curricula:", err);
+                    dbRoot.innerHTML = `<li class="text-rose-500 p-4 text-xs italic">Gagal memuat data.</li>`;
+                }
+            }
+
+            async function createCurriculum(name) {
+                try {
+                    const res = await fetch(`${API_BASE}/curricula`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                    const newCurr = await res.json();
+                    await fetchCurricula(newCurr.id);
+                } catch (err) {
+                    alert("Gagal menambah kurikulum.");
+                }
+            }
+
+            async function uploadFiles(id, files) {
+                const targetId = uploadCurriculumSelect.value || id;
+                if (!targetId) { alert('Pilih kurikulum tujuan terlebih dahulu.'); return; }
+                try {
+                    uploadBtn.disabled = true;
+                    uploadBtn.innerHTML = `<div class="loader scale-50 border-white border-t-indigo-300"></div> <span>Uploading...</span>`;
+                    const sumber = sumberSelect.value;
+                    for (let i = 0; i < files.length; i++) {
+                        const formData = new FormData();
+                        formData.append('file', files[i]);
+                        formData.append('sumber', sumber);
+                        const res = await fetch(`${API_BASE}/curricula/${targetId}/documents`, { method: 'POST', body: formData });
+                        if (!res.ok) { const errText = await res.text(); throw new Error(`Gagal upload ${files[i].name}: ${errText}`); }
+                    }
+                    pendingFiles = [];
+                    renderSelectedFiles();
+                    alert('Upload berhasil!');
+                    await fetchCurricula(targetId);
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    uploadBtn.disabled = pendingFiles.length === 0;
+                    uploadBtn.innerHTML = `<i class="ph ph-upload-simple"></i><span>Upload</span>`;
+                }
+            }
+
+            async function startAnalysis(id) {
+                try {
+                    showLoading(true);
+                    const res = await fetch(`${API_BASE}/curricula/${id}/analyze`, { method: 'POST' });
+                    if (!res.ok) throw new Error(await res.text());
+                    
+                    // Update local state to processing
+                    const curr = curricula.find(c => c.id === id);
+                    if (curr) curr.analysis_status = 'processing';
+                    renderSidebar();
+
+                    pollResults(id);
+                } catch (err) {
+                    alert("Gagal memulai analisis: " + err.message);
+                    showLoading(false);
+                }
+            }
+
+            async function pollResults(id) {
+                if (pollInterval) clearInterval(pollInterval);
+                pollInterval = setInterval(async () => {
+                    try {
+                        const res = await fetch(`${API_BASE}/curricula/${id}/results`);
+                        const data = await res.json();
+                        
+                        if (data.status === 'completed' && data.result) {
+                            clearInterval(pollInterval);
+                            results[id] = data.result;
+                            
+                            // Refresh all curricula to get updated status and file list
+                            await fetchCurricula(id);
+                            
+                            renderAnalysis(id);
+                            fetchOverlap(id);
+                            showLoading(false);
+                        } else if (data.status === 'error') {
+                            clearInterval(pollInterval);
+                            // Cek di data.error atau data.result.error
+                            const msg = data.error || (data.result && data.result.error) || "Unknown error";
+                            alert("Analisis error: " + msg);
+                            await fetchCurricula(id);
+                            showLoading(false);
+                        }
+                    } catch (err) { console.error(err); }
+                }, 3000);
+            }
+
+            async function viewDocument(cid, did) {
+                modalTitle.innerText = "Memuat...";
+                modalContent.innerText = "Mohon tunggu...";
+                docModal.classList.remove('hidden');
+                
+                try {
+                    const res = await fetch(`${API_BASE}/curricula/${cid}/documents/${did}`);
+                    const doc = await res.json();
+                    
+                    modalTitle.innerText = doc.filename;
+                    modalContent.innerText = doc.teks_original || "Tidak ada teks.";
+                    modalIcon.className = getFileIcon(doc.filename) + " text-2xl";
+                    
+                    // Logic to get reason from analysis results
+                    const analysisRes = results[cid];
+                    let reasonMsg = '';
+                    let statusLabel = '';
+                    
+                    if (analysisRes) {
+                        if (analysisRes.used_doc_ids && analysisRes.used_doc_ids.includes(did)) {
+                            statusLabel = '<span class="text-emerald-500 font-bold">[AKTIF]</span>';
+                            reasonMsg = analysisRes.inclusion_reasons ? analysisRes.inclusion_reasons[did] : 'Lolos kurasi.';
+                        } else if (analysisRes.ignored_docs && analysisRes.ignored_docs[did]) {
+                            statusLabel = '<span class="text-rose-500 font-bold">[EXCLUDE]</span>';
+                            reasonMsg = analysisRes.ignored_docs[did];
+                        }
+                    }
+
+                    modalMeta.innerHTML = `
+                        <div class="flex flex-col items-end gap-1">
+                            <div class="flex items-center gap-2">
+                                ${statusLabel}
+                                <span class="text-slate-500 font-medium">${doc.sumber}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">${reasonMsg}</div>
+                            <div class="text-[10px] text-slate-400">${doc.word_count || 0} kata • ${doc.n_sentences || 0} kalimat</div>
+                        </div>
+                    `;
+                } catch (err) {
+                    modalTitle.innerText = "Error";
+                    modalContent.innerText = "Gagal memuat dokumen.";
+                }
+            }
+
+            async function fetchOverlap(id) {
+                const others = curricula.filter(c => c.id !== id && c.analysis_status === 'completed');
+                if (others.length === 0) {
+                    emptyOverlapState.classList.remove('hidden');
+                    overlapContent.classList.add('hidden');
+                    return;
+                }
+
+                overlapContent.innerHTML = `<div class="flex justify-center py-8"><div class="loader"></div></div>`;
+                overlapContent.classList.remove('hidden');
+                emptyOverlapState.classList.add('hidden');
+
+                let html = '';
+                for (const other of others) {
+                    try {
+                        const res = await fetch(`${API_BASE}/overlap/${id}/${other.id}`);
+                        if (!res.ok) continue;
+                        const overlap = await res.json();
+                        html += renderOverlapCard(other.name, overlap);
+                    } catch (err) { console.error(err); }
+                }
+                
+                if (html) {
+                    overlapContent.innerHTML = html;
+                } else {
+                    emptyOverlapState.classList.remove('hidden');
+                    overlapContent.classList.add('hidden');
+                }
+            }
+
+            // === RENDERING ===
+
+            function renderSidebar() {
+                dbRoot.innerHTML = curricula.map(curr => {
+                    const docs = curr.documents || [];
+                    const categories = [
+                        { id: 'silabus', name: "1. Kurikulum & Silabus", icon: "ph ph-article-fill", color: "text-rose-500", bg: "bg-rose-50" },
+                        { id: 'materi',  name: "2. Materi Pembelajaran", icon: "ph ph-presentation-fill", color: "text-amber-500", bg: "bg-amber-50" },
+                        { id: 'handout', name: "3. Handout", icon: "ph ph-notebook-fill", color: "text-teal-500", bg: "bg-teal-50" }
+                    ];
+
+                    return `
+                    <li class="mb-3">
+                        <div class="flex items-center gap-1 py-1 px-1 rounded transition-colors ${curr.id === currentId ? 'bg-indigo-50' : ''} hover:bg-slate-100 group">
+                            <button onclick="event.stopPropagation(); window.toggleCurriculum('${curr.id}')" class="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded hover:bg-slate-200 transition-all" title="${collapsedCurricula[curr.id] ? 'Expand' : 'Collapse'}">
+                                <i class="ph ph-caret-right text-slate-400 transition-transform duration-200 ${!collapsedCurricula[curr.id] && docs.length ? 'rotate-90' : ''} text-xs"></i>
+                            </button>
+                            <div class="flex items-center gap-2 flex-grow cursor-pointer min-w-0 ${curr.id === currentId ? 'text-indigo-700 font-bold' : 'text-slate-700 font-medium'}" onclick="selectCurriculum('${curr.id}')">
+                                <i class="ph ph-folder-simple-fill text-${curr.color || 'indigo'}-500 text-base flex-shrink-0"></i>
+                                <span class="truncate text-sm">${curr.name}</span>
+                                ${curr.analysis_status === 'processing' ? '<i class="ph ph-circle-notch animate-spin text-indigo-400 ml-auto text-xs"></i>' : ''}
+                            </div>
+                            <button onclick="event.stopPropagation(); window.deleteCurriculum('${curr.id}')" class="text-rose-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity p-1 ml-auto flex-shrink-0" title="Hapus Kurikulum">
+                                <i class="ph ph-trash text-sm"></i>
+                            </button>
+                        </div>
+                        <ul class="sub-list ${!collapsedCurricula[curr.id] ? 'open' : ''} pl-4 ml-2 border-l-2 border-slate-100 space-y-2 mt-1">
+                            ${categories.map(cat => {
+                                const catKey = `${curr.id}_${cat.id}`;
+                                const isCatCollapsed = !!collapsedCategories[catKey];
+                                const catDocs = docs.filter(d => {
+                                    if (d.sumber !== cat.name) return false;
+                                    if (!searchQuery) return true;
+                                    const matchFilename = d.filename.toLowerCase().includes(searchQuery.toLowerCase());
+                                    const matchText = d.teks_original && d.teks_original.toLowerCase().includes(searchQuery.toLowerCase());
+                                    return matchFilename || matchText;
+                                });
+                                return `
+                                <li>
+                                    <div class="flex items-center gap-2 px-2 py-1 rounded-md ${cat.bg} ${cat.color} text-[10px] font-bold uppercase tracking-wider mb-1 cursor-pointer select-none" onclick="window.toggleCategory('${catKey}')">
+                                        <i class="${cat.icon} text-sm"></i>
+                                        <span class="flex-grow">${cat.name.split('. ')[1]}</span>
+                                        <i class="ph ${isCatCollapsed ? 'ph-caret-right' : 'ph-caret-down'} text-xs opacity-70"></i>
+                                    </div>
+                                    <ul class="space-y-0.5 ml-1 ${isCatCollapsed ? 'hidden' : ''}">
+                                        ${catDocs.map(doc => {
+                                             const res = results[curr.id];
+                                             let statusBadge = '';
+                                             
+                                             if (res && res.used_doc_ids && res.used_doc_ids.includes(doc.id)) {
+                                                 statusBadge = `<span class="bg-emerald-100 text-emerald-600 text-[8px] px-1 rounded-sm border border-emerald-200 font-bold ml-auto cursor-help" title="Lolos Kurasi & Masuk Model">AKTIF</span>`;
+                                             } else if (res && res.ignored_docs && res.ignored_docs[doc.id]) {
+                                                 const reason = res.ignored_docs[doc.id];
+                                                 statusBadge = `<span class="bg-rose-50 text-rose-400 text-[8px] px-1 rounded-sm border border-rose-100 font-bold ml-auto cursor-help" title="Alasan Exclude: ${reason}">EXCLUDE</span>`;
+                                             }
+
+                                             let snippetHtml = '';
+                                             if (searchQuery && doc.teks_original && doc.teks_original.toLowerCase().includes(searchQuery.toLowerCase())) {
+                                                 const snippet = getSearchSnippet(doc.teks_original, searchQuery);
+                                                 if (snippet) {
+                                                     snippetHtml = `
+                                                     <div class="text-[10px] text-slate-400 dark:text-slate-500 italic mt-1 ml-6 border-l-2 border-indigo-200 dark:border-indigo-500 pl-2 pr-1 line-clamp-2 leading-relaxed break-all">
+                                                         ${highlightSearch(snippet, searchQuery)}
+                                                     </div>
+                                                     `;
+                                                 }
+                                             }
+
+                                             return `
+                                             <li class="flex flex-col py-1 px-2 rounded hover:bg-white hover:shadow-sm cursor-pointer text-slate-600 transition-all group" onclick="viewDocument('${curr.id}', '${doc.id}')">
+                                                 <div class="flex items-center gap-2 w-full min-w-0">
+                                                     <i class="${getFileIcon(doc.filename)} text-base flex-shrink-0"></i>
+                                                     <span class="truncate text-[11px] flex-grow" title="${doc.filename}">${highlightSearch(doc.filename, searchQuery)}</span>
+                                                     ${statusBadge}
+                                                     <div class="flex items-center gap-1 flex-shrink-0">
+                                                         <i class="ph ph-eye text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity text-xs" title="Lihat Teks"></i>
+                                                         <button onclick="event.stopPropagation(); window.deleteDocument('${curr.id}', '${doc.id}')" class="text-rose-400 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity p-0.5" title="Hapus Dokumen">
+                                                             <i class="ph ph-trash text-xs"></i>
+                                                         </button>
+                                                     </div>
+                                                 </div>
+                                                 ${snippetHtml}
+                                             </li>
+                                             `;
+                                         }).join('')}
+                                        ${catDocs.length === 0 ? '<li class="text-[10px] text-slate-300 italic px-2">Kosong</li>' : ''}
+                                    </ul>
+                                </li>
+                                `;
+                            }).join('')}
+                        </ul>
+                    </li>
+                `}).join('');
+            }
+
+            function getFileIcon(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                if (ext === 'pdf') return 'ph ph-file-pdf text-rose-500';
+                if (['doc', 'docx'].includes(ext)) return 'ph ph-file-doc text-blue-500';
+                if (['ppt', 'pptx'].includes(ext)) return 'ph ph-presentation text-orange-500';
+                return 'ph ph-file text-slate-400';
+            }
+
+            function getSearchSnippet(text, query) {
+                if (!text || !query) return "";
+                const cleanText = text.replace(/\s+/g, ' ');
+                const sentences = cleanText.split(/(?<=[.!?])\s+/);
+                const match = sentences.find(s => s.toLowerCase().includes(query.toLowerCase()));
+                if (match) {
+                    if (match.length > 120) {
+                        const idx = match.toLowerCase().indexOf(query.toLowerCase());
+                        let start = Math.max(0, idx - 45);
+                        let end = Math.min(match.length, idx + query.length + 65);
+                        let sub = match.substring(start, end);
+                        if (start > 0) sub = "..." + sub;
+                        if (end < match.length) sub = sub + "...";
+                        return sub.trim();
+                    }
+                    return match.trim();
+                }
+                
+                const idx = cleanText.toLowerCase().indexOf(query.toLowerCase());
+                if (idx === -1) return "";
+                let start = Math.max(0, idx - 45);
+                let end = Math.min(cleanText.length, idx + query.length + 65);
+                let sub = cleanText.substring(start, end);
+                if (start > 0) sub = "..." + sub;
+                if (end < cleanText.length) sub = sub + "...";
+                return sub.trim();
+            }
+
+            function highlightSearch(text, query) {
+                if (!query) return text;
+                const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedQuery})`, 'gi');
+                return text.replace(regex, '<mark>$1</mark>');
+            }
+
+            // ── Theme ─────────────────────────────────────────────
+            function applyTheme(isDark) {
+                document.documentElement.classList.toggle('dark', isDark);
+                themeIcon.className = isDark ? 'ph ph-sun text-xl' : 'ph ph-moon text-xl';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            }
+            const _savedTheme = localStorage.getItem('theme');
+            const _prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(_savedTheme === 'dark' || (!_savedTheme && _prefersDark));
+
+            themeToggleBtn.addEventListener('click', () => {
+                applyTheme(!document.documentElement.classList.contains('dark'));
+            });
+
+            function renderUploadCurriculumSelect() {
+                const prev = uploadCurriculumSelect.value;
+                uploadCurriculumSelect.innerHTML = '<option value="">-- Pilih Kurikulum --</option>'
+                    + curricula.map(c => `<option value="${c.id}" ${c.id === currentId ? 'selected' : ''}>${c.name}</option>`).join('');
+                if (prev && curricula.find(c => c.id === prev)) uploadCurriculumSelect.value = prev;
+                else if (currentId) uploadCurriculumSelect.value = currentId;
+            }
+
+            function renderSelectedFiles() {
+                if (pendingFiles.length === 0) {
+                    selectedFilesList.classList.add('hidden');
+                    uploadBtn.disabled = true;
+                    return;
+                }
+                selectedFilesList.classList.remove('hidden');
+                uploadBtn.disabled = false;
+                selectedFilesList.innerHTML = pendingFiles.map((f, i) => `
+                    <div class="flex items-center justify-between bg-white border border-slate-200 rounded px-2 py-1 text-[10px] text-slate-600">
+                        <span class="truncate flex-grow">${getFileIcon(f.name).includes('pdf') ? '📄' : getFileIcon(f.name).includes('doc') ? '📝' : '📊'} ${f.name}</span>
+                        <button onclick="removePendingFile(${i})" class="ml-2 text-slate-400 hover:text-rose-500 flex-shrink-0">
+                            <i class="ph ph-x"></i>
+                        </button>
+                    </div>`).join('');
+            }
+
+            window.removePendingFile = (i) => { pendingFiles.splice(i, 1); renderSelectedFiles(); };
+
+            function renderDropdown() {
+                dropdownMenu.innerHTML = curricula.map(curr => `
+                    <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-indigo-50 hover:text-indigo-600" onclick="selectCurriculum('${curr.id}', true)">${curr.name}</a>
+                `).join('');
+            }
+
+            async function selectCurriculum(id, fromDropdown = false) {
+                if (fromDropdown) dropdownMenu.classList.add('hidden');
+                
+                currentId = id;
+                const curr = curricula.find(c => c.id === id);
+                if (!curr) return;
+
+                selectedText.innerText = curr.name;
+                overlapTargetName.innerText = curr.name;
+                
+                // Update sidebar highlight
+                renderSidebar();
+
+                // Clear UI states
+                analysisContent.classList.add('hidden');
+                overlapContent.classList.add('hidden');
+                emptyAnalysisState.classList.add('hidden');
+                emptyOverlapState.classList.add('hidden');
+
+                if (curr.analysis_status === 'completed') {
+                    if (results[id]) {
+                        renderAnalysis(id);
+                        fetchOverlap(id);
+                    } else {
+                        await checkAndShowResults(id);
+                    }
+                } else if (curr.analysis_status === 'processing') {
+                    showLoading(true);
+                    pollResults(id);
+                } else {
+                    showLoading(false);
+                    emptyAnalysisState.classList.remove('hidden');
+                    emptyOverlapState.classList.remove('hidden');
+                }
+            }
+
+            async function checkAndShowResults(id) {
+                showLoading(true);
+                try {
+                    const res = await fetch(`${API_BASE}/curricula/${id}/results`);
+                    const data = await res.json();
+                    if (data.status === 'completed' && data.result) {
+                        results[id] = data.result;
+                        renderSidebar(); // re-render sidebar agar badge AKTIF/EXCLUDE muncul
+                        renderAnalysis(id);
+                        fetchOverlap(id);
+                        showLoading(false);
+                    } else {
+                        showLoading(false);
+                        emptyAnalysisState.classList.remove('hidden');
+                        emptyOverlapState.classList.remove('hidden');
+                    }
+                } catch (err) {
+                    showLoading(false);
+                    emptyAnalysisState.classList.remove('hidden');
+                }
+            }
+
+            function renderAnalysis(id) {
+                const res = results[id];
+                if (!res) return;
+
+                emptyAnalysisState.classList.add('hidden');
+                analysisContent.classList.remove('hidden');
+
+                // Render Topics
+                topicContainer.innerHTML = res.topics.map(topic => `
+                    <div class="bg-slate-50 border border-slate-100 rounded-lg p-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-[11px] font-bold text-slate-500 uppercase">${topic.name}</p>
+                            <span class="text-[10px] font-medium text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">Weight: ${topic.weight}</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${topic.top_words.map(tag => `
+                                <span class="inline-block bg-white text-slate-700 text-[10px] px-2 py-1 rounded border border-slate-200 shadow-sm">
+                                    ${tag}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Render Summary — diurutkan dari score tertinggi & difilter berdasarkan searchQuery
+                const filteredSummary = res.summary.filter(item => {
+                    if (!searchQuery) return true;
+                    return item.kalimat.toLowerCase().includes(searchQuery.toLowerCase());
+                });
+
+                summaryList.innerHTML = [...filteredSummary].sort((a, b) => b.score - a.score).map(item => {
+                    let badgeColor = "bg-slate-100 text-slate-600";
+                    if (item.sumber.includes("Kurikulum")) badgeColor = "bg-rose-100 text-rose-700";
+                    if (item.sumber.includes("Materi")) badgeColor = "bg-amber-100 text-amber-700";
+                    if (item.sumber.includes("Handout")) badgeColor = "bg-teal-100 text-teal-700";
+
+                    return `
+                    <li class="flex items-start gap-3 p-3 bg-white border border-slate-100 rounded-xl hover:shadow-md transition-all group">
+                        <i class="ph ph-check-circle text-indigo-500 text-xl flex-shrink-0"></i>
+                        <div class="flex flex-col gap-1.5 flex-grow">
+                            <span class="text-sm text-slate-700 leading-relaxed font-medium">${highlightSearch(item.kalimat, searchQuery)}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${badgeColor}">${item.sumber.split('. ')[1]}</span>
+                                <span class="text-[9px] text-slate-400 italic">Score: ${item.score.toFixed(4)}</span>
+                            </div>
+                        </div>
+                    </li>
+                `}).join('');
+            }
+
+            function renderOverlapCard(otherName, overlap) {
+                const { score, pairs, desc, common_keywords } = overlap;
+                let html = `<div class="mb-6 last:mb-0">`;
+                html += `<h3 class="text-sm font-semibold text-slate-700 mb-2">vs ${otherName}</h3>`;
+                
+                if (score > 2 || (common_keywords && common_keywords.length > 0)) {
+                    html += `
+                        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-bold text-indigo-700 uppercase tracking-wide">Hasil Perbandingan</span>
+                                <span class="text-xs font-semibold text-slate-500">Skor: ${score}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5 mb-4">
+                                <div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${score}%"></div>
+                            </div>
+                            
+                            ${common_keywords && common_keywords.length > 0 ? `
+                                <div class="mb-4">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Kata Kunci Bersama:</p>
+                                    <div class="flex flex-wrap gap-1">
+                                        ${common_keywords.map(kw => `
+                                            <span class="bg-indigo-50 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded border border-indigo-100">${kw}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            ${pairs && pairs.length > 0 ? `
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Konsep Serupa:</p>
+                                <div class="space-y-3">
+                                    ${pairs.slice(0, 3).map(p => `
+                                        <div class="bg-slate-50 p-2 rounded text-[10px] text-slate-600 border-l-2 border-indigo-400">
+                                            <div class="flex justify-between mb-1">
+                                                <span class="font-medium text-indigo-600">Kemiripan ${p.similarity}%</span>
+                                            </div>
+                                            <p class="italic text-slate-500 mb-1 line-clamp-2" title="${p.from_a}">"...${p.from_a}..."</p>
+                                            <div class="h-px bg-slate-200 my-1"></div>
+                                            <p class="italic text-slate-700 line-clamp-2" title="${p.from_b}">"...${p.from_b}..."</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+
+                            <p class="text-[11px] text-slate-500 mt-3 leading-relaxed border-t border-slate-100 pt-3 italic">${desc}</p>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="bg-white border border-slate-200 rounded-lg p-4 border-dashed">
+                            <p class="text-xs text-slate-400 italic">${desc}</p>
+                        </div>
+                    `;
+                }
+                html += `</div>`;
+                return html;
+            }
+
+            function showLoading(show) {
+                if (show) {
+                    loadingState.classList.remove('hidden');
+                    analysisContent.classList.add('hidden');
+                    emptyAnalysisState.classList.add('hidden');
+                } else {
+                    loadingState.classList.add('hidden');
+                }
+            }
+
+            // === EVENT LISTENERS ===
+
+            analyzeBtn.addEventListener('click', () => {
+                if (currentId) startAnalysis(currentId);
+            });
+
+            dropdownButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('hidden');
+            });
+            
+            window.addEventListener('click', () => {
+                dropdownMenu.classList.add('hidden');
+            });
+
+            addCurriculumBtn.addEventListener('click', () => {
+                const name = prompt("Masukkan nama kurikulum baru:");
+                if (name) createCurriculum(name);
+            });
+
+
+
+            // Upload Panel Toggle
+            uploadPanelToggle.addEventListener('click', () => {
+                const isOpen = !uploadPanelBody.classList.toggle('hidden');
+                uploadPanelCaret.style.transform = isOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+                if (isOpen) renderUploadCurriculumSelect();
+            });
+
+            // Drag & Drop
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files).filter(f => /\.(pdf|docx?|pptx?)$/i.test(f.name));
+                if (files.length) { pendingFiles = [...pendingFiles, ...files]; renderSelectedFiles(); }
+                else alert('Format file tidak didukung. Gunakan PDF, DOCX, atau PPTX.');
+            });
+
+            // Upload Button
+            uploadBtn.addEventListener('click', () => {
+                if (pendingFiles.length === 0) return;
+                uploadFiles(currentId, pendingFiles);
+            });
+
+            // File input
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    pendingFiles = [...pendingFiles, ...Array.from(fileInput.files)];
+                    renderSelectedFiles();
+                    fileInput.value = '';
+                }
+            });
+
+            // Category toggle (global)
+            window.toggleCategory = (catKey) => {
+                collapsedCategories[catKey] = !collapsedCategories[catKey];
+                renderSidebar();
+            };
+
+            // Curriculum expand/collapse toggle (global)
+            window.toggleCurriculum = (id) => {
+                collapsedCurricula[id] = !collapsedCurricula[id];
+                renderSidebar();
+            };
+
+
+
+            // ── Search ────────────────────────────────────────────
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.trim();
+                renderSidebar();
+                if (currentId && results[currentId]) {
+                    renderAnalysis(currentId);
+                }
+            });
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    searchQuery = '';
+                    renderSidebar();
+                    if (currentId && results[currentId]) {
+                        renderAnalysis(currentId);
+                    }
+                }
+            });
+
+            // Initial load
+            async function checkBackendHealth() {
+                try {
+                    const healthUrl = API_BASE.replace('/api', '') + '/health';
+                    const res = await fetch(healthUrl, { mode: 'cors' });
+                    if (res.ok) {
+                        const data = await res.json();
+                        return data.status === 'ok';
+                    }
+                } catch (e) {
+                    console.log("Backend offline or waking up...");
+                }
+                return false;
+            }
+
+            function showWakeupOverlay(show) {
+                const overlay = document.getElementById('wakeup-overlay');
+                if (show) {
+                    overlay.classList.remove('hidden');
+                } else {
+                    overlay.classList.add('hidden');
+                }
+            }
+
+            function updateWakeupStatus(text) {
+                const statusEl = document.getElementById('wakeup-status');
+                if (statusEl) {
+                    statusEl.innerText = text;
+                }
+            }
+
+            async function initApp() {
+                showWakeupOverlay(true);
+                updateWakeupStatus("Memeriksa status server...");
+                const isOnline = await checkBackendHealth();
+                if (isOnline) {
+                    showWakeupOverlay(false);
+                    fetchCurricula();
+                } else {
+                    updateWakeupStatus("Membangunkan server (1-2 menit)...");
+                    const pollInterval = setInterval(async () => {
+                        const check = await checkBackendHealth();
+                        if (check) {
+                            clearInterval(pollInterval);
+                            showWakeupOverlay(false);
+                            fetchCurricula();
+                        }
+                    }, 5000);
+                }
+            }
+
+            async function deleteDocument(curriculumId, docId) {
+                if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini?")) return;
+                try {
+                    const res = await fetch(`${API_BASE}/curricula/${curriculumId}/documents/${docId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!res.ok) throw new Error(await res.text());
+                    alert("Dokumen berhasil dihapus!");
+                    await fetchCurricula(curriculumId);
+                } catch (err) {
+                    alert("Gagal menghapus dokumen: " + err.message);
+                }
+            }
+
+            async function deleteCurriculum(curriculumId) {
+                if (!confirm("Apakah Anda yakin ingin menghapus kurikulum ini beserta seluruh dokumen di dalamnya?")) return;
+                try {
+                    const res = await fetch(`${API_BASE}/curricula/${curriculumId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!res.ok) throw new Error(await res.text());
+                    alert("Kurikulum berhasil dihapus!");
+                    
+                    // If the deleted curriculum was the active one, clear currentId or select another one
+                    if (currentId === curriculumId) {
+                        currentId = null;
+                        selectedText.innerText = "Pilih Kurikulum";
+                        overlapTargetName.innerText = "";
+                        analysisContent.classList.add('hidden');
+                        overlapContent.classList.add('hidden');
+                        emptyAnalysisState.classList.remove('hidden');
+                        emptyOverlapState.classList.remove('hidden');
+                    }
+                    
+                    await fetchCurricula();
+                } catch (err) {
+                    alert("Gagal menghapus kurikulum: " + err.message);
+                }
+            }
+
+            initApp();
+
+            // Set global functions for inline onclicks
+            window.selectCurriculum = selectCurriculum;
+            window.viewDocument = viewDocument;
+            window.deleteDocument = deleteDocument;
+            window.deleteCurriculum = deleteCurriculum;
+            window.closeModal = () => docModal.classList.add('hidden');
+
+        });
+    </script>
+</body>
+</html>
