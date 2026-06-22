@@ -1,13 +1,3 @@
----
-title: PLN Summary
-emoji: 🌍
-colorFrom: blue
-colorTo: purple
-sdk: docker
-pinned: false
-license: apache-2.0
----
-
 # 📚 CurricuLens-PLN
 
 <div align="center">
